@@ -54,16 +54,19 @@ st.markdown(
 )
 
 
-# Cargar Modelo y Artefactos
+# Cargar Modelo y Artefactos de forma segura
 @st.cache_resource
 def load_artifacts():
   try:
+    import joblib
+    import tensorflow as tf
+
     model = tf.keras.models.load_model('student_mlp_model.keras')
     scaler = joblib.load('scaler.pkl')
     le = joblib.load('label_encoder.pkl')
     return model, scaler, le
   except Exception as e:
-    st.error(f'Error al cargar los artefactos del modelo: {e}')
+    st.error(f'Error detallado al cargar los artefactos: {e}')
     return None, None, None
 
 
