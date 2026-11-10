@@ -6,34 +6,49 @@ import tensorflow as tf
 
 # Configuración de la página
 st.set_page_config(
-    page_title="Predicción de Deserción Escolar | CUN",
+    page_title="Sistema Inteligente de Alerta Temprana | CUN",
     page_icon="🎓",
     layout="wide",
 )
 
-# Estilos CSS personalizados
+# Estilos CSS personalizados premium
 st.markdown(
     """
     <style>
     .main-header {
-        font-size: 2.2rem;
+        font-size: 2.3rem;
         color: #1E3A8A;
         text-align: center;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
+        font-weight: 800;
+        margin-bottom: 0.2rem;
     }
     .sub-header {
         font-size: 1.1rem;
         color: #4B5563;
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
-    .prediction-box {
-        padding: 1.5rem;
+    .card-style {
+        background-color: #F8FAFC;
+        border-radius: 12px;
+        padding: 1.2rem;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .alert-banner {
+        padding: 1.2rem;
         border-radius: 10px;
         text-align: center;
-        font-weight: bold;
-        font-size: 1.3rem;
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+    .rec-box {
+        background-color: #EFF6FF;
+        border-left: 5px solid #3B82F6;
+        padding: 1rem;
+        border-radius: 6px;
         margin-top: 1rem;
     }
     </style>
@@ -41,20 +56,20 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Título y Descripción
+# Encabezado Principal
 st.markdown(
-    '<div class="main-header">🎓 Sistema de Alerta Temprana de Deserción'
+    '<div class="main-header">🎓 Sistema Inteligente de Prevención de Deserción'
     ' Académica</div>',
     unsafe_allow_html=True,
 )
 st.markdown(
-    '<div class="sub-header">Modelado con Redes Neuronales Artificiales (Deep'
-    ' MLP) - Especialización en IA (CUN)</div>',
+    '<div class="sub-header">Plataforma de Diagnóstico Temprano mediante Deep'
+    ' Learning (MLP) — Especialización en IA (CUN)</div>',
     unsafe_allow_html=True,
 )
 
 
-# Cargar Modelo y Artefactos de forma segura
+# Cargar Modelo y Artefactos
 @st.cache_resource
 def load_artifacts():
   try:
@@ -66,39 +81,13 @@ def load_artifacts():
     le = joblib.load('label_encoder.pkl')
     return model, scaler, le
   except Exception as e:
-    st.error(f'Error al cargar los artefactos del modelo: {e}')
+    st.error(f'⚠️ Error al cargar el modelo o los escaladores: {e}')
     return None, None, None
 
 
 model, scaler, le = load_artifacts()
 
 if model is not None:
-  st.sidebar.header('📋 Formulario del Estudiante')
-  st.sidebar.write('Ingrese los datos sociodemográficos y académicos:')
-
-  # 1. Estado Civil
-  marital_status = st.sidebar.selectbox(
-      'Estado Civil',
-      options=[1, 2, 3, 4, 5, 6],
-      format_func=lambda x: {
-          1: 'Soltero/a',
-          2: 'Casado/a',
-          3: 'Viudo/a',
-          4: 'Divorciado/a',
-          5: 'Unión de hecho',
-          6: 'Separado/a',
-      }[x],
-  )
-
-  # 2. Modo y Orden de Solicitud
-  application_mode = st.sidebar.slider(
-      'Modo de Solicitud (Código de Admisión)', 1, 57, 1
-  )
-  application_order = st.sidebar.slider(
-      'Orden de Opción de Solicitud (1 a 9)', 0, 9, 1
-  )
-
-  # 3. Programa Académico / Carrera (Mapeo Completo y Descriptivo)
   course_mapping = {
       33: 'Tecnologías de Producción de Biocombustibles',
       171: 'Diseño de Animación y Multimedia',
@@ -116,29 +105,7 @@ if model is not None:
       9757: 'Servicio Social (Jornada Diurna)',
       9991: 'Agronomía (Jornada Nocturna)',
   }
-  course = st.sidebar.selectbox(
-      'Programa Académico / Carrera',
-      options=list(course_mapping.keys()),
-      format_func=lambda x: course_mapping[x],
-      index=1,
-  )
 
-  # 4. Jornada de Asistencia
-  daytime_evening = st.sidebar.radio(
-      'Jornada de Asistencia',
-      options=[1, 0],
-      format_func=lambda x: 'Diurna' if x == 1 else 'Nocturna',
-  )
-
-  # 5. Calificación y Nota Previa
-  prev_qual = st.sidebar.slider(
-      'Calificación / Titulación Previa (Código)', 1, 43, 1
-  )
-  prev_grade = st.sidebar.number_input(
-      'Nota de Titulación Previa (0 - 200)', 0.0, 200.0, 120.0
-  )
-
-  # 6. Nacionalidad (Mapeo Descriptivo)
   nacionality_mapping = {
       1: 'Portugal (Nacionalidad Principal)',
       2: 'España',
@@ -161,15 +128,6 @@ if model is not None:
       108: 'Santo Tomé y Príncipe',
       109: 'Turquía',
   }
-  nacionality = st.sidebar.selectbox(
-      'Nacionalidad del Estudiante',
-      options=list(nacionality_mapping.keys()),
-      format_func=lambda x: nacionality_mapping[x],
-      index=0,
-  )
-
-  # 7. Antecedentes Familiares (Nivel Educativo y Ocupación)
-  st.sidebar.subheader('👨‍👩‍👧 Antecedentes Familiares')
 
   qualification_mapping = {
       1: 'Educación Superior - Licenciatura/Grado',
@@ -186,19 +144,6 @@ if model is not None:
       40: 'Lectura y Escritura Básica',
   }
 
-  mother_qual = st.sidebar.selectbox(
-      'Nivel Educativo de la Madre',
-      options=list(qualification_mapping.keys()),
-      format_func=lambda x: qualification_mapping[x],
-      index=0,
-  )
-  father_qual = st.sidebar.selectbox(
-      'Nivel Educativo del Padre',
-      options=list(qualification_mapping.keys()),
-      format_func=lambda x: qualification_mapping[x],
-      index=0,
-  )
-
   occupation_mapping = {
       0: 'Estudiante / Sin Ocupación Laboral',
       1: 'Directivos, Poder Ejecutivo y Órganos Legislativos',
@@ -214,44 +159,175 @@ if model is not None:
       99: 'Otra Ocupación / Desconocida',
   }
 
+  # BARRA LATERAL: BOTONES RÁPIDOS
+  st.sidebar.header('⚡ Carga Rápida de Perfiles')
+  st.sidebar.write('Selecciona una plantilla para autocompletar:')
+
+  preset = st.sidebar.radio(
+      'Modo de Prueba:', [
+          '✍️ Manual (Personalizado)',
+          '⚠️ Perfil de Alto Riesgo',
+          '🎓 Perfil de Alto Rendimiento',
+          'ℹ️ Perfil Estudiante Regular',
+      ]
+  )
+
+  if preset == '⚠️ Perfil de Alto Riesgo':
+    def_marital = 1
+    def_course = 171
+    def_age = 19
+    def_tuition = 0
+    def_scholarship = 0
+    def_debtor = 1
+    def_c1_enrolled = 6
+    def_c1_approved = 1
+    def_c1_grade = 8.5
+    def_c2_enrolled = 6
+    def_c2_approved = 0
+    def_c2_grade = 4.0
+  elif preset == '🎓 Perfil de Alto Rendimiento':
+    def_marital = 1
+    def_course = 9119
+    def_age = 20
+    def_tuition = 1
+    def_scholarship = 1
+    def_debtor = 0
+    def_c1_enrolled = 6
+    def_c1_approved = 6
+    def_c1_grade = 16.5
+    def_c2_enrolled = 6
+    def_c2_approved = 6
+    def_c2_grade = 17.0
+  elif preset == 'ℹ️ Perfil Estudiante Regular':
+    def_marital = 1
+    def_course = 9254
+    def_age = 21
+    def_tuition = 1
+    def_scholarship = 0
+    def_debtor = 0
+    def_c1_enrolled = 6
+    def_c1_approved = 4
+    def_c1_grade = 12.0
+    def_c2_enrolled = 6
+    def_c2_approved = 4
+    def_c2_grade = 11.5
+  else:
+    def_marital = 1
+    def_course = 171
+    def_age = 20
+    def_tuition = 1
+    def_scholarship = 0
+    def_debtor = 0
+    def_c1_enrolled = 6
+    def_c1_approved = 5
+    def_c1_grade = 13.0
+    def_c2_enrolled = 6
+    def_c2_approved = 5
+    def_c2_grade = 13.0
+
+  st.sidebar.markdown('---')
+  st.sidebar.header('📋 Parámetros Detallados')
+
+  marital_status = st.sidebar.selectbox(
+      'Estado Civil',
+      options=[1, 2, 3, 4, 5, 6],
+      index=def_marital - 1,
+      format_func=lambda x: {
+          1: 'Soltero/a',
+          2: 'Casado/a',
+          3: 'Viudo/a',
+          4: 'Divorciado/a',
+          5: 'Unión de hecho',
+          6: 'Separado/a',
+      }[x],
+  )
+  application_mode = st.sidebar.slider(
+      'Modo de Solicitud (Admisión)', 1, 57, 1
+  )
+  application_order = st.sidebar.slider(
+      'Orden de Prioridad de Carrera', 0, 9, 1
+  )
+
+  course_keys = list(course_mapping.keys())
+  course = st.sidebar.selectbox(
+      'Programa Académico',
+      options=course_keys,
+      index=course_keys.index(def_course) if def_course in course_keys else 0,
+      format_func=lambda x: course_mapping[x],
+  )
+  daytime_evening = st.sidebar.radio(
+      'Jornada',
+      options=[1, 0],
+      format_func=lambda x: 'Diurna' if x == 1 else 'Nocturna',
+  )
+
+  prev_qual = st.sidebar.slider('Titulación Previa (Código)', 1, 43, 1)
+  prev_grade = st.sidebar.number_input(
+      'Nota Titulación Previa (0-200)', 0.0, 200.0, 120.0
+  )
+
+  nac_keys = list(nacionality_mapping.keys())
+  nacionality = st.sidebar.selectbox(
+      'Nacionalidad',
+      options=nac_keys,
+      format_func=lambda x: nacionality_mapping[x],
+      index=0,
+  )
+
+  st.sidebar.subheader('👨‍👩‍👧 Entorno Familiar')
+  qual_keys = list(qualification_mapping.keys())
+  mother_qual = st.sidebar.selectbox(
+      'Educación Madre',
+      options=qual_keys,
+      format_func=lambda x: qualification_mapping[x],
+      index=0,
+  )
+  father_qual = st.sidebar.selectbox(
+      'Educación Padre',
+      options=qual_keys,
+      format_func=lambda x: qualification_mapping[x],
+      index=0,
+  )
+
+  occ_keys = list(occupation_mapping.keys())
   mother_occ = st.sidebar.selectbox(
-      'Ocupación de la Madre',
-      options=list(occupation_mapping.keys()),
+      'Ocupación Madre',
+      options=occ_keys,
       format_func=lambda x: occupation_mapping[x],
       index=4,
   )
   father_occ = st.sidebar.selectbox(
-      'Ocupación del Padre',
-      options=list(occupation_mapping.keys()),
+      'Ocupación Padre',
+      options=occ_keys,
       format_func=lambda x: occupation_mapping[x],
       index=4,
   )
 
-  # 8. Datos Académicos y Condición Estudiantil
-  st.sidebar.subheader('📌 Datos Académicos y Socioeconómicos')
+  st.sidebar.subheader('📌 Situación Financiera y Social')
   admission_grade = st.sidebar.number_input(
-      'Nota de Admisión (0 - 200)', 0.0, 200.0, 125.0
+      'Nota Admisión (0-200)', 0.0, 200.0, 125.0
   )
   displaced = st.sidebar.selectbox(
-      '¿Condición de Desplazado/a?',
+      '¿Desplazado/a?',
       [0, 1],
       format_func=lambda x: 'Sí' if x == 1 else 'No',
   )
   special_needs = st.sidebar.selectbox(
-      '¿Necesidades Educativas Especiales?',
+      '¿Necesidades Especiales?',
       [0, 1],
       format_func=lambda x: 'Sí' if x == 1 else 'No',
   )
   debtor = st.sidebar.selectbox(
       '¿Deudor de Matrícula?',
       [0, 1],
+      index=def_debtor,
       format_func=lambda x: 'Sí' if x == 1 else 'No',
   )
   tuition_up_to_date = st.sidebar.selectbox(
-      '¿Matrícula al Día con la Institución?',
+      '¿Matrícula al Día?',
       [0, 1],
+      index=def_tuition,
       format_func=lambda x: 'Sí' if x == 1 else 'No',
-      index=1,
   )
   gender = st.sidebar.selectbox(
       'Género',
@@ -259,65 +335,55 @@ if model is not None:
       format_func=lambda x: 'Femenino' if x == 0 else 'Masculino',
   )
   scholarship = st.sidebar.selectbox(
-      '¿Posee Beca de Estudios?',
+      '¿Becario/a?',
       [0, 1],
+      index=def_scholarship,
       format_func=lambda x: 'Sí' if x == 1 else 'No',
   )
-  age = st.sidebar.number_input('Edad al Momento de Matrícula', 15, 90, 20)
+  age = st.sidebar.number_input('Edad al Matricularse', 15, 90, def_age)
   international = st.sidebar.selectbox(
       '¿Estudiante Internacional?',
       [0, 1],
       format_func=lambda x: 'Sí' if x == 1 else 'No',
   )
 
-  # 9. Rendimiento Académico (Semestres 1 y 2)
-  st.sidebar.subheader('📖 Rendimiento 1er Semestre')
-  c1_credited = st.sidebar.number_input(
-      'Asignaturas Acreditadas (1er Sem)', 0, 20, 0
-  )
+  st.sidebar.subheader('📖 1er Semestre')
+  c1_credited = st.sidebar.number_input('Acreditadas (1 Sem)', 0, 20, 0)
   c1_enrolled = st.sidebar.number_input(
-      'Asignaturas Matriculadas (1er Sem)', 0, 20, 6
+      'Matriculadas (1 Sem)', 0, 20, def_c1_enrolled
   )
   c1_evaluations = st.sidebar.number_input(
-      'Evaluaciones Realizadas (1er Sem)', 0, 30, 6
+      'Evaluaciones (1 Sem)', 0, 30, def_c1_enrolled
   )
   c1_approved = st.sidebar.number_input(
-      'Asignaturas Aprobadas (1er Sem)', 0, 20, 6
+      'Aprobadas (1 Sem)', 0, 20, def_c1_approved
   )
   c1_grade = st.sidebar.number_input(
-      'Promedio Notas (1er Sem - Escala 0 a 20)', 0.0, 20.0, 13.0
+      'Nota Promedio (1 Sem 0-20)', 0.0, 20.0, def_c1_grade
   )
-  c1_without_eval = st.sidebar.number_input(
-      'Asignaturas Sin Evaluación (1er Sem)', 0, 10, 0
-  )
+  c1_without_eval = st.sidebar.number_input('Sin Evaluar (1 Sem)', 0, 10, 0)
 
-  st.sidebar.subheader('📖 Rendimiento 2do Semestre')
-  c2_credited = st.sidebar.number_input(
-      'Asignaturas Acreditadas (2do Sem)', 0, 20, 0
-  )
+  st.sidebar.subheader('📖 2do Semestre')
+  c2_credited = st.sidebar.number_input('Acreditadas (2 Sem)', 0, 20, 0)
   c2_enrolled = st.sidebar.number_input(
-      'Asignaturas Matriculadas (2do Sem)', 0, 20, 6
+      'Matriculadas (2 Sem)', 0, 20, def_c2_enrolled
   )
   c2_evaluations = st.sidebar.number_input(
-      'Evaluaciones Realizadas (2do Sem)', 0, 30, 6
+      'Evaluaciones (2 Sem)', 0, 30, def_c2_enrolled
   )
   c2_approved = st.sidebar.number_input(
-      'Asignaturas Aprobadas (2do Sem)', 0, 20, 6
+      'Aprobadas (2 Sem)', 0, 20, def_c2_approved
   )
   c2_grade = st.sidebar.number_input(
-      'Promedio Notas (2do Sem - Escala 0 a 20)', 0.0, 20.0, 13.0
+      'Nota Promedio (2 Sem 0-20)', 0.0, 20.0, def_c2_grade
   )
-  c2_without_eval = st.sidebar.number_input(
-      'Asignaturas Sin Evaluación (2do Sem)', 0, 10, 0
-  )
+  c2_without_eval = st.sidebar.number_input('Sin Evaluar (2 Sem)', 0, 10, 0)
 
-  # 10. Indicadores Macroeconómicos
-  st.sidebar.subheader('📉 Indicadores Macroeconómicos')
-  unemp_rate = st.sidebar.number_input('Tasa de Desempleo (%)', 0.0, 30.0, 10.8)
-  inf_rate = st.sidebar.number_input('Tasa de Inflación (%)', -5.0, 10.0, 1.4)
-  gdp = st.sidebar.number_input('Crecimiento PIB (GDP)', -10.0, 10.0, 1.74)
+  st.sidebar.subheader('📉 Entorno Económico')
+  unemp_rate = st.sidebar.number_input('Tasa Desempleo (%)', 0.0, 30.0, 10.8)
+  inf_rate = st.sidebar.number_input('Tasa Inflación (%)', -5.0, 10.0, 1.4)
+  gdp = st.sidebar.number_input('PIB / GDP', -10.0, 10.0, 1.74)
 
-  # Construcción exacta del DataFrame con las 36 características esperadas por el Scaler
   input_data = pd.DataFrame([{
       'Marital status': marital_status,
       'Application mode': application_mode,
@@ -357,68 +423,150 @@ if model is not None:
       'GDP': gdp,
   }])
 
-  # Panel Principal de la Aplicación
-  col1, col2 = st.columns([1, 1])
+  # PESTAÑAS (TABS)
+  tab1, tab2, tab3 = st.tabs([
+      '🔮 Inferencia y Diagnóstico',
+      '📊 Ficha del Estudiante',
+      'ℹ️ Información del Modelo',
+  ])
 
-  with col1:
-    st.subheader('📊 Resumen del Perfil del Estudiante')
-    st.write(f'**Programa Académico:** {course_mapping[course]}')
+  with tab1:
+    st.subheader('🎯 Diagnóstico en Tiempo Real')
     st.write(
-        f"**Edad:** {age} años | **Género:** {'Masculino' if gender==1 else 'Femenino'}"
-    )
-    st.write(f'**Nacionalidad:** {nacionality_mapping[nacionality]}')
-    st.write(
-        f"**Becario/a:** {'Sí' if scholarship==1 else 'No'} | **Matrícula al"
-        f" Día:** {'Sí' if tuition_up_to_date==1 else 'No'}"
-    )
-    st.write(
-        '**Asignaturas Aprobadas (1er Sem):**'
-        f' {c1_approved} de {c1_enrolled} (Promedio: {c1_grade})'
-    )
-    st.write(
-        '**Asignaturas Aprobadas (2do Sem):**'
-        f' {c2_approved} de {c2_enrolled} (Promedio: {c2_grade})'
+        'Presiona el botón para ejecutar el análisis a través del Perceptrón'
+        ' Multicapa:'
     )
 
-  with col2:
-    st.subheader('🔮 Inferencia con Red Neuronal Profunda')
-    if st.button('🚀 Evaluar Pronóstico Académico', use_container_width=True):
-      # Preprocesamiento con el scaler entrenado
+    if st.button(
+        '⚡ Diagnosticar Riesgo Académico',
+        use_container_width=True,
+        type='primary',
+    ):
       input_scaled = scaler.transform(input_data)
-
-      # Inferencia con la red neuronal MLP
       preds_prob = model.predict(input_scaled)[0]
       pred_class_idx = np.argmax(preds_prob)
       pred_class_label = le.classes_[pred_class_idx]
 
-      prob_df = pd.DataFrame({
-          'Estado Académico': le.classes_,
-          'Probabilidad (%)': (preds_prob * 100).round(2),
-      })
+      prob_dropout = (
+          preds_prob[np.where(le.classes_ == 'Dropout')[0][0]] * 100
+      )
+      prob_graduate = (
+          preds_prob[np.where(le.classes_ == 'Graduate')[0][0]] * 100
+      )
+      prob_enrolled = (
+          preds_prob[np.where(le.classes_ == 'Enrolled')[0][0]] * 100
+      )
 
-      # Presentación visual con alertas diferenciadas
+      # Tarjetas de Métricas Visuales Superior
+      m_col1, m_col2, m_col3 = st.columns(3)
+      with m_col1:
+        st.metric(
+            label='Riesgo de Deserción',
+            value=f'{prob_dropout:.1f}%',
+            delta=f"{'-' if prob_dropout < 50 else '+'}{prob_dropout:.1f}%",
+            delta_color='inverse',
+        )
+      with m_col2:
+        st.metric(
+            label='Permanencia / En Curso', value=f'{prob_enrolled:.1f}%'
+        )
+      with m_col3:
+        st.metric(
+            label='Probabilidad de Graduación',
+            value=f'{prob_graduate:.1f}%',
+            delta=f'{prob_graduate:.1f}%',
+        )
+
+      st.markdown('---')
+
+      # Banner de Dictamen
       if pred_class_label == 'Dropout':
         st.markdown(
-            '<div class="prediction-box" style="background-color: #FEE2E2;'
-            ' color: #991B1B;">⚠️ ALERTA TEMPRANA: RIESGO ALTO DE DESERCIÓN'
-            ' (Dropout)</div>',
+            '<div class="alert-banner" style="background-color: #FEE2E2;'
+            ' color: #991B1B; border: 2px solid #EF4444;">🚨 DICTAMEN: ALTO'
+            ' RIESGO DE DESERCIÓN (Dropout)</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            """
+                    <div class="rec-box">
+                        <strong>💡 Plan de Intervención Institucional Recomendado:</strong>
+                        <ul>
+                            <li><strong>Alerta Financiera:</strong> Revisar estado de pagos de matrícula y ofrecer plan de financiación o alivio socioeconómico.</li>
+                            <li><strong>Refuerzo Académico:</strong> Programar tutorías personalizadas en asignaturas de bajo rendimiento.</li>
+                            <li><strong>Acompañamiento Psicosocial:</strong> Agendar cita con Bienestar Estudiantil para evaluación individual.</li>
+                        </ul>
+                    </div>
+                """,
             unsafe_allow_html=True,
         )
       elif pred_class_label == 'Graduate':
         st.markdown(
-            '<div class="prediction-box" style="background-color: #D1FAE5;'
-            ' color: #065F46;">🎉 PRONÓSTICO FAVORABLE: GRADUADO EXITOSO'
-            ' (Graduate)</div>',
+            '<div class="alert-banner" style="background-color: #D1FAE5;'
+            ' color: #065F46; border: 2px solid #10B981;">🎉 DICTAMEN: PERFIL'
+            ' FAVORABLE A GRADUACIÓN (Graduate)</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            """
+                    <div class="rec-box" style="background-color: #ECFDF5; border-left-color: #10B981;">
+                        <strong>🌟 Recomendación Académica:</strong> Estudiante en excelente trayectoria. Se sugiere postular a monitorías académicas, proyectos de investigación o becas de excelencia.
+                    </div>
+                """,
             unsafe_allow_html=True,
         )
       else:
         st.markdown(
-            '<div class="prediction-box" style="background-color: #FEF3C7;'
-            ' color: #92400E;">ℹ️ ESTADO INTERMEDIO: ESTUDIANTE EN CURSO'
-            ' (Enrolled)</div>',
+            '<div class="alert-banner" style="background-color: #FEF3C7;'
+            ' color: #92400E; border: 2px solid #F59E0B;">ℹ️ DICTAMEN:'
+            ' ESTUDIANTE EN CURSO / ESTADO REGULAR (Enrolled)</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            """
+                    <div class="rec-box" style="background-color: #FFFBEB; border-left-color: #F59E0B;">
+                        <strong>📌 Monitoreo Continuo:</strong> El estudiante mantiene un rendimiento regular. Mantener seguimiento regular al cierre de cada periodo académico.
+                    </div>
+                """,
             unsafe_allow_html=True,
         )
 
-      st.write('---')
-      st.write('### Distribución de Probabilidades de la Red Neuronal')
+      st.write('### 📊 Gráfico de Distribución de Probabilidades')
+      prob_df = pd.DataFrame({
+          'Estado Académico': le.classes_,
+          'Probabilidad (%)': (preds_prob * 100).round(2),
+      })
       st.bar_chart(prob_df.set_index('Estado Académico'))
+
+  with tab2:
+    st.subheader('📋 Ficha Consolidada del Estudiante')
+    col_a, col_b = st.columns(2)
+    with col_a:
+      st.markdown(f'**Programa:** {course_mapping[course]}')
+      st.markdown(
+          f"**Edad:** {age} años | **Género:** {'Masculino' if gender==1 else 'Femenino'}"
+      )
+      st.markdown(f'**Nacionalidad:** {nacionality_mapping[nacionality]}')
+      st.markdown(f"**Beca Activa:** {'Sí' if scholarship==1 else 'No'}")
+    with col_b:
+      st.markdown(
+          '**Estado de Matrícula:**'
+          f" {'Al Día' if tuition_up_to_date==1 else 'Pendiente/Deudor'}"
+      )
+      st.markdown(
+          '**Rendimiento 1er Sem:**'
+          f' {c1_approved}/{c1_enrolled} aprobadas (Nota: {c1_grade})'
+      )
+      st.markdown(
+          '**Rendimiento 2do Sem:**'
+          f' {c2_approved}/{c2_enrolled} aprobadas (Nota: {c2_grade})'
+      )
+
+  with tab3:
+    st.subheader('🧠 Ficha Técnica del Modelo MLP')
+    st.write("""
+            - **Arquitectura:** Red Neuronal Multicapa (Deep MLP) en TensorFlow/Keras.
+            - **Precisión Obtenida (Test Accuracy):** 75.14% en clasificación multiclase.
+            - **Variables Procesadas:** 36 variables sociodemográficas, académicas y macroeconómicas normalizadas con `StandardScaler`.
+            - **Despliegue:** Interfaz dinámica en Streamlit optimizada para toma de decisiones institucionales.
+        """)
