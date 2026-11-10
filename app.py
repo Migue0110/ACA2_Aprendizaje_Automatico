@@ -1,4 +1,7 @@
-import streamlit as st  # <-- ¡Aquí es donde va el import!
+import joblib
+import numpy as np
+import pandas as pd
+import streamlit as st
 import tensorflow as tf
 
 # Configuración de la página
