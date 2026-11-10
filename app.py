@@ -1,3 +1,6 @@
+import streamlit as st  # <-- ¡Aquí es donde va el import!
+import tensorflow as tf
+
 # Configuración de la página
 st.set_page_config(
     page_title='Predicción de Deserción Escolar | CUN',
